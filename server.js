@@ -1,8 +1,9 @@
 import Express from 'express';
 import morgan from 'morgan';
+
 const app = Express();
 const port = 3000;
-const products = [
+let products = [
 	{
 		id: 1,
 		name: 'Product 1',
@@ -26,12 +27,33 @@ app.post('/products', (req, res) => {
 	res.send(newProduct);
 });
 
-app.put('/products', (req, res) => {
+app.put('/products/:id', (req, res) => {
+	const newData = req.body;
+
+	const profuctFound = products.find(
+		product => product.id === parseInt(req.params.id),
+	);
+
+	if (!profuctFound) return res.status(404).send('Product not found');
+
+	products = products.map(p =>
+		p.id === parseInt(req.params.id) ? { ...p, ...newData } : p,
+	);
+
 	res.send('Put products');
 });
 
-app.delete('/products', (req, res) => {
-	res.send('Delete products');
+app.delete('/products/:id', (req, res) => {
+	const profuctFound = products.find(
+		product => product.id === parseInt(req.params.id),
+	);
+	if (!profuctFound) return res.status(404).send('Product not found');
+
+	const newProducts = products.filter(
+		product => product.id !== parseInt(req.params.id),
+	);
+
+	res.sendStatus(204);
 });
 
 app.get('/products/:id', (req, res) => {
